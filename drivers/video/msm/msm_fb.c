@@ -4072,6 +4072,10 @@ static int msm_fb_ioctl(struct fb_info *info, unsigned int cmd,
 		ret = msm_fb_resume_sw_refresher(mfd);
 		break;
 
+    case FBIO_WAITFORVSYNC:
+        ret = mdp4_overlay_wait4vsync(info);
+        break;
+
 	case MSMFB_CURSOR:
 		ret = copy_from_user(&cursor, argp, sizeof(cursor));
 		if (ret)
