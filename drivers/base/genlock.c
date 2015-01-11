@@ -167,7 +167,7 @@ EXPORT_SYMBOL(genlock_create_lock);
  * other processes
  */
 
-static int genlock_get_fd(struct genlock *lock)
+int genlock_get_fd(struct genlock *lock)
 {
 	int ret;
 
@@ -182,6 +182,7 @@ static int genlock_get_fd(struct genlock *lock)
 	fd_install(ret, lock->file);
 	return ret;
 }
+EXPORT_SYMBOL(genlock_get_fd);
 
 /**
  * genlock_attach_lock - Attach an existing lock to a handle
