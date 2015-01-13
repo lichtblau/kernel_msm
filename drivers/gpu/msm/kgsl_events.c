@@ -213,6 +213,7 @@ int kgsl_add_event(struct kgsl_device *device, u32 id, u32 ts,
 	struct kgsl_event *event;
 	unsigned int queued = 0, cur_ts;
 	struct kgsl_context *context = NULL;
+	struct adreno_context *drawctxt = NULL;
 
 	BUG_ON(!mutex_is_locked(&device->mutex));
 
@@ -223,6 +224,7 @@ int kgsl_add_event(struct kgsl_device *device, u32 id, u32 ts,
 		context = kgsl_context_get(device, id);
 		if (context == NULL)
 			return -EINVAL;
+		drawctxt = ADRENO_CONTEXT(context);
 	}
 	/*
 	 * If the caller is creating their own timestamps, let them schedule
@@ -230,7 +232,7 @@ int kgsl_add_event(struct kgsl_device *device, u32 id, u32 ts,
 	 * queued.
 	 */
 	if (context == NULL ||
-		((context->flags & KGSL_CONTEXT_USER_GENERATED_TS) == 0)) {
+		((drawctxt->flags & CTXT_FLAGS_USER_GENERATED_TS) == 0)) {
 		queued = kgsl_readtimestamp(device, context,
 			KGSL_TIMESTAMP_QUEUED);
 
@@ -338,11 +340,7 @@ void kgsl_cancel_event(struct kgsl_device *device, struct kgsl_context *context,
 		void *priv)
 {
 	struct kgsl_event *event;
-	struct list_head *head;
-
-	BUG_ON(!mutex_is_locked(&device->mutex));
-
-	head = _get_list_head(device, context);
+	struct list_head *head = _get_list_head(device, context);
 
 	event = _find_event(device, head, timestamp, func, priv);
 
